@@ -136,6 +136,12 @@ def predict(model_name :str, file_id: str):
 
     model.eval()
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    model.to(device)
+
+    logging.warning(device)
+
     all_results = []
 
     for batch in tqdm(pred_loader, desc="Predicting"):
@@ -146,12 +152,12 @@ def predict(model_name :str, file_id: str):
             #attention_mask = batch['attention_mask'].to('cpu')
             # make predictions
             inputs = {
-                "input_ids": batch[0],
-                "attention_mask": batch[1],
-                "token_type_ids": batch[2],
+                "input_ids": batch[0].to(device),
+                "attention_mask": batch[1].to(device),
+                "token_type_ids": batch[2].to(device),
             }
 
-            feature_indices = batch[3]
+            feature_indices = batch[3].to(device)
 
             outputs = model(**inputs)
 
